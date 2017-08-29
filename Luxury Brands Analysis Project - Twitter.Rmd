@@ -1,0 +1,187 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+setwd("/Users/chunqingxu/Downloads")
+
+library("quanteda")
+library("quantedaData")
+library("ldatuning")
+library("tidytext")
+library("stringi")
+library("corpustools")
+library("plotrix")
+library("scales")
+library("devtools")
+library("SparseM")
+library("RTextTools")
+library("topicmodels")
+library("ggplot2")
+library("readtext")
+library("bursts")
+library("lsa")
+library("stm")
+library("Rtsne")
+library("geometry")
+library("magic")
+library("abind")
+
+```
+
+```{r}
+coach <- readtext("/Users/chunqingxu/Downloads/Coach.txt")
+burberry <- readtext("/Users/chunqingxu/Downloads/Burberry.txt")
+chanel <- readtext("/Users/chunqingxu/Downloads/Chanel.txt")
+gucci <- readtext("/Users/chunqingxu/Downloads/Gucci.txt")
+hermes <- readtext("/Users/chunqingxu/Downloads/Hermes.txt")
+katespade <- readtext("/Users/chunqingxu/Downloads/KateSpade.txt")
+lv <- readtext("/Users/chunqingxu/Downloads/LouisVuitton.txt")
+michaelkors <- readtext("/Users/chunqingxu/Downloads/MichaelKors.txt")
+mouawad <- readtext("/Users/chunqingxu/Downloads/Mouawad.txt")
+prada <- readtext("/Users/chunqingxu/Downloads/Prada.txt")
+
+coach_dfm <- dfm(coach$text, remove = stopwords("english"), remove_punct = TRUE)
+burberry_dfm <- dfm(burberry$text, remove = stopwords("english"), remove_punct = TRUE)
+chanel_dfm <- dfm(chanel$text, remove = stopwords("english"), remove_punct = TRUE)
+gucci_dfm <- dfm(gucci$text, remove = stopwords("english"), remove_punct = TRUE)
+hermes_dfm <- dfm(hermes$text, remove = stopwords("english"), remove_punct = TRUE)
+katespade_dfm <- dfm(katespade$text, remove = stopwords("english"), remove_punct = TRUE)
+lv_dfm <- dfm(lv$text, remove = stopwords("english"), remove_punct = TRUE)
+michaelkors_dfm <- dfm(michaelkors$text, remove = stopwords("english"), remove_punct = TRUE)
+mouawad_dfm <- dfm(mouawad$text, remove = stopwords("english"), remove_punct = TRUE)
+prada_dfm <- dfm(prada$text, remove = stopwords("english"), remove_punct = TRUE)
+```
+
+```{r}
+topfeatures(michaelkors_dfm,30)
+```
+
+
+```{r}
+mk_words <-c('#bag','nwt','leather','#buzz','#hot','tote','black','medium','large', '#bags','bag','jet','set','#style','rt','#quality','michael','shoulder','new','protesters', 
+'saffiano','anti-fur','disrupt','signature','satchel','crossbody','zip')
+mk_fre <- c(57,35,34,29,28,27,20,20,20,19,17,16,16,16,15,15,15,13,12,12,11,11,11,10,10,9,9)
+wordcloud(mk_words, mk_fre)
+```
+
+
+```{r}
+topfeatures(hermes_dfm,30)
+```
+
+
+```{r}
+hermes_words <-c('#bags','#bag','leather',' blue','clemence','#scarf','#fashion','#scarves','birkin', 'white','hardware','#handbag','box','35','amp','#wrap','#luxury','kelly','gold','#silk', 
+'#share','auth','sellier','evelyne','crossbody','gen','pm')
+hermes_fre <- c(35,35,34,31,30,21,19,19,18,18,18,16,16,15,13,12,11,11,11,11,11,11,10,10,10,10,10)
+wordcloud(hermes_words, hermes_fre)
+```
+```{r}
+pos<-read.table("https://raw.githubusercontent.com/pchest/Text_as_Data/master/HW2data/positive-words.txt", stringsAsFactors = F)
+neg<-read.table("https://raw.githubusercontent.com/pchest/Text_as_Data/master/HW2data/negative-words.txt", stringsAsFactors = F)
+pos<-as.character(pos$V1)
+neg<-as.character(neg$V1)
+```
+
+```{r}
+mydict <- dictionary(list(pos=pos, neg=neg))
+coach_dfm<-dfm(coach$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+coach_dfm[,'pos']
+coach_dfm[,'neg']
+sent_coach<-as.numeric(coach_dfm[,'pos'])-as.numeric(coach_dfm[,'neg'])
+sent_coach
+```
+
+```{r}
+mydict <- dictionary(list(pos=pos, neg=neg))
+bb_dfm<-dfm(burberry$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+bb_dfm[,'pos']
+bb_dfm[,'neg']
+sent_bb<-as.numeric(bb_dfm[,'pos'])-as.numeric(bb_dfm[,'neg'])
+sent_bb
+```
+```{r}
+c_dfm<-dfm(chanel$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+c_dfm[,'pos']
+c_dfm[,'neg']
+sent_c<-as.numeric(c_dfm[,'pos'])-as.numeric(c_dfm[,'neg'])
+sent_c
+```
+```{r}
+g_dfm<-dfm(gucci$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+g_dfm[,'pos']
+g_dfm[,'neg']
+sent_g<-as.numeric(g_dfm[,'pos'])-as.numeric(g_dfm[,'neg'])
+sent_g
+```
+```{r}
+h_dfm<-dfm(hermes$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+h_dfm[,'pos']
+h_dfm[,'neg']
+sent_h<-as.numeric(h_dfm[,'pos'])-as.numeric(h_dfm[,'neg'])
+sent_h
+```
+```{r}
+ks_dfm<-dfm(katespade$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+ks_dfm[,'pos']
+ks_dfm[,'neg']
+sent_ks<-as.numeric(ks_dfm[,'pos'])-as.numeric(ks_dfm[,'neg'])
+sent_ks
+```
+```{r}
+lv_dfm<-dfm(lv$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+lv_dfm[,'pos']
+lv_dfm[,'neg']
+sent_lv<-as.numeric(lv_dfm[,'pos'])-as.numeric(lv_dfm[,'neg'])
+sent_lv
+```
+```{r}
+mk_dfm<-dfm(michaelkors$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+mk_dfm[,'pos']
+mk_dfm[,'neg']
+sent_mk<-as.numeric(mk_dfm[,'pos'])-as.numeric(mk_dfm[,'neg'])
+sent_mk
+```
+```{r}
+p_dfm<-dfm(prada$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+p_dfm[,'pos']
+p_dfm[,'neg']
+sent_p<-as.numeric(p_dfm[,'pos'])-as.numeric(p_dfm[,'neg'])
+sent_p
+```
+```{r}
+m_dfm<-dfm(mouawad$text, remove_punct=TRUE, stem=F, dictionary=mydict)
+m_dfm[,'pos']
+m_dfm[,'neg']
+sent_m<-as.numeric(m_dfm[,'pos'])-as.numeric(m_dfm[,'neg'])
+sent_m
+```
+
+
